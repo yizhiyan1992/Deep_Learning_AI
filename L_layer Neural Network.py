@@ -1,3 +1,14 @@
+'''
+This Neural Network supports binary classification problems.
+The prediction should be changed into {0,1} class
+A test dataset (bank-note from UCI) is uploaded to test this model.
+
+Three params can be adjusted:
+1) iteration: No of iterations
+2) learning_rate: steps
+3) layer_list: a list based input, where each number in the list indicates the number of neurons of that layer (e.g. [5] is a one hidden layer NN with 5 neurons) 
+'''
+
 import pandas as pd
 import numpy as np
 import os
