@@ -1,21 +1,30 @@
 import pandas as pd
 import numpy as np
-import math
 import os
+import matplotlib.pyplot as plt
 os.chdir('/Users/Zhiyan1992/Desktop/')
 
 class L_layer_Neural_Network():
-    def __init__(self,layer_list=[5]):
-        self.layer_list=layer_list
+    def __init__(self):
+        self.layer_list=[5]
         self.parameters={}
         self.caches={}
 
-    def train_model(self,X,Y):
+    def train_model(self,X,Y,iteration=5000,learning_rate=0.1,layer_list=None):
+        if layer_list:
+            self.layer_list=layer_list
         self.X=X
         self.Y=Y
         self.initialize_parameter()
-        self.forward_propagation(self.X)
-        self.compute_loss_val(Y,self.y_prediction)
+        loss=[]
+        for i in range(iteration):
+            self.forward_propagation(self.X)
+            loss_val=self.compute_loss_val(Y,self.y_prediction)
+            self.compute_derivative(self.caches,self.y_prediction,self.parameters,self.Y)
+            self.update_parameters(self.parameters,self.deri,learning_rate)
+            loss.append(loss_val)
+        plt.plot(range(len(loss)),loss)
+        plt.show()
         return
 
     def initialize_parameter(self):
@@ -56,6 +65,8 @@ class L_layer_Neural_Network():
         '''
         self.caches={}
         A=X
+        self.caches['Z' + str(0)] = X
+        self.caches['A' + str(0)] = X
         for i in range(len(self.parameters)//2):
             Z=np.dot(self.parameters['W'+str(i+1)],A)
             A=1/(1+np.exp(-Z))
@@ -74,19 +85,61 @@ class L_layer_Neural_Network():
         m=Y.shape[1]
         loss=-(1/m)*(np.dot(Y,np.log(Y_prediction).T)+np.dot((1-Y),np.log(1-Y_prediction).T))
         self.loss=loss[0][0]
-        print(self.loss)
+        return self.loss
+
+    def compute_derivative(self,caches,prediction,parameters,Y):
+        m=prediction.shape[1]
+        dZ=(prediction-Y)
+        self.deri={}
+        for i in reversed(range(len(parameters)//2)):
+            dW=np.dot(dZ,caches['A'+str(i)].T)*(1/m)
+            db=np.sum(dZ,axis=1,keepdims=True)*(1/m)
+            self.deri['dW' + str(i + 1)] = dW
+            self.deri['db' + str(i + 1)] = db
+            dA_prev=np.dot(parameters['W'+str(i+1)].T,dZ)
+            dZ_prev=dA_prev*(np.exp(-caches['Z'+str(i)])/((1+np.exp(-caches['Z'+str(i)]))*(1+np.exp(-caches['Z'+str(i)]))))
+            dZ=dZ_prev
         return
 
-def main():
-    train=pd.read_csv('bank-note/train.csv',header=None)
-    X,Y=train.values[:,:-1],train.values[:,-1]
-    Y=Y[:,np.newaxis]
-    X,Y=X.T,Y.T
-    print(X.shape,Y.shape)
-    # row represents features and column represent sample size
-    ANN=L_layer_Neural_Network()
-    ANN.train_model(X,Y)
+    def update_parameters(self,parameters,deri,learning_rate):
+        for i in range(len(parameters)//2):
+            parameters['W'+str(i+1)]=parameters['W'+str(i+1)]-learning_rate*deri['dW'+str(i+1)]
+            parameters['b' + str(i + 1)] = parameters['b' + str(i + 1)] - learning_rate *deri['db' + str(i + 1)]
+        return
 
+    def predict(self,X):
+        A = X
+        for i in range(len(self.parameters) // 2):
+            Z = np.dot(self.parameters['W' + str(i + 1)], A)
+            A = 1 / (1 + np.exp(-Z))
+        res=np.where(A>=0.1,1,0)
+        return res
+
+    def score(self,Y,Y_predict):
+        m=Y.shape[1]
+        return np.sum(Y==Y_predict)/m
+
+def main():
+    '''
+    preprocessing data:
+    data shape should be [N,M], where N is the number of features, and M is the sample size
+    '''
+    train=pd.read_csv('bank-note/train.csv',header=None)
+    test=pd.read_csv('bank-note/test.csv',header=None)
+    X,Y=train.values[:,:-1],train.values[:,-1]
+    X_test,Y_test=test.values[:,:-1],test.values[:,-1]
+    Y=Y[:,np.newaxis]
+    Y_test = Y_test[:, np.newaxis]
+    X,Y=X.T,Y.T
+    X_test,Y_test=X_test.T,Y_test.T
+
+    # train model and predict samples
+    ANN=L_layer_Neural_Network()
+    ANN.train_model(X,Y,iteration=5000,learning_rate=0.2,layer_list=[7])
+    res=ANN.predict(X)
+    print('prediction accuracy on training set: ',ANN.score(Y,res))
+    res_test=ANN.predict(X_test)
+    print('prediction accuracy on test set: ',ANN.score(Y_test,res_test))
 
 if __name__=="__main__":
     main()
