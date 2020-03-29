@@ -6,7 +6,7 @@ A test dataset (bank-note from UCI) is uploaded to test this model.
 Three params can be adjusted:
 1) iteration: No of iterations
 2) learning_rate: steps
-3) layer_list: a list based input, where each number in the list indicates the number of neurons of that layer (e.g. [5] is a one hidden layer NN with 5 neurons) 
+3) layer_list: a list based input, where each number in the list indicates the number of neurons of that layer (e.g. [5] is a one hidden layer NN with 5 neurons)
 '''
 
 import pandas as pd
@@ -123,7 +123,7 @@ class L_layer_Neural_Network():
         for i in range(len(self.parameters) // 2):
             Z = np.dot(self.parameters['W' + str(i + 1)], A)
             A = 1 / (1 + np.exp(-Z))
-        res=np.where(A>=0.1,1,0)
+        res=np.where(A>=0.5,1,0)
         return res
 
     def score(self,Y,Y_predict):
