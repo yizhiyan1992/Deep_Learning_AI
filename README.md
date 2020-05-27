@@ -1,4 +1,5 @@
 # Deep_Learning_AI
+#ANN folder:
 AndrewNg's Coursera class
 Task 1:
   build a L-layer Neural Network for binary classification problem (0-1)
@@ -15,3 +16,16 @@ Task 3:
 build a L-layer Neural Network with Drop-out regularization
 Three different save_prob are testes, namely [1, 0.95, 0.8]
 The plots (4 figures) indicate their loss values with first 15000 iterations (pic 1); their prediction regions (pic2-pic4). Result indicates that when dropout_rate=0.8 it performs the best on test set.
+
+#CNN folder:
+target: using CNN model to recognize the hand signs of numbers
+1. LeNet5 model
+2. Pretrained VGG16 model
+3. ResNet18 model
+
+#RNN folder:
+1. pretrained GloVe word embedding.
+download text dataset from:
+http://mng.bz/0tIo
+download GloVe word embedding from:
+http://nlp.stanford.edu/projects/glove
